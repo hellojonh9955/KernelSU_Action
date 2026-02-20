@@ -179,11 +179,6 @@ jobs:
         cd $GITHUB_WORKSPACE/kernel_workspace
         git clone https://android.googlesource.com/platform/system/tools/mkbootimg tools -b master-kernel-build-2022 --depth=1
         
-    - name: Fix Compiler Error
-      run: |
-          sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' $GITHUB_WORKSPACE/kernel_workspace/android-kernel/arch/arm64/configs/msm8953-perf_defconfig
-          echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> $GITHUB_WORKSPACE/kernel_workspace/android-kernel/arch/arm64/configs/msm8953-perf_defconfig
-          
     - name: Download kernel source
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace
@@ -193,6 +188,11 @@ jobs:
         else
           echo "LOCALVERSION=" >> $GITHUB_ENV
         fi
+
+    - name: Fix Compiler Error
+      run: |
+        find . -name "msm8953-perf_defconfig" -exec sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' {} +
+        find . -name "msm8953-perf_defconfig" -exec sh -c 'echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> {}' \;
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
