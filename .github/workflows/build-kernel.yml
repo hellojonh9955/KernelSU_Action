@@ -192,11 +192,15 @@ jobs:
     - name: Fix Compiler Error
       run: |
         cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-        find . -type f -name "Makefile*" -exec sed -i 's/-Werror//g' {} +
-        find . -name "msm8953-perf_defconfig" -exec sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' {} +
-        find . -name "msm8953-perf_defconfig" -exec sh -c 'echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> {}' \;
-        grep -rl "\-implicit-function-declaration" . | xargs sed -i 's/-implicit-function-declaration//g' || true
-        grep -rl "\-unknown-warning-option" . | xargs sed -i 's/-unknown-warning-option//g' || true
+         # Disable Stack Protector
+         find . -name "msm8953-perf_defconfig" -exec sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' {} +
+         find . -name "msm8953-perf_defconfig" -exec sh -c 'echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> {}' \;
+         # Remove problematic flags from ALL Makefiles and Kbuild files
+         find . -type f \( -name "Makefile*" -o -name "Kbuild*" \) -exec sed -i 's/-Werror//g' {} +
+         find . -type f \( -name "Makefile*" -o -name "Kbuild*" \) -exec sed -i 's/-implicit-function-declaration//g' {} +
+         find . -type f \( -name "Makefile*" -o -name "Kbuild*" \) -exec sed -i 's/-unknown-warning-option//g' {} +
+         # Force ignore some common Clang 14 errors
+         sed -i 's/KBUILD_CFLAGS +=/KBUILD_CFLAGS += -Wno-implicit-function-declaration -Wno-unknown-warning-option -Wno-error=/g' Makefile
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
