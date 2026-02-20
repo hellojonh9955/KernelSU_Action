@@ -65,13 +65,7 @@ jobs:
                 echo "$CONFIG=$(grep -w "$CONFIG" "$CONFIG_ENV" | head -n 1 | cut -d "=" -f 2)" >> $GITHUB_ENV
             fi
         done
-      
-    - name: Fix Compiler Error
-      run: |
-          cd $GITHUB_WORKSPACE/kernel_workspace/android-kernel
-          sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' arch/arm64/configs/msm8953-perf_defconfig
-          echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> arch/arm64/configs/msm8953-perf_defconfig
-
+    
     - name: Remove unused packages
       if: env.REMOVE_UNUSED_PACKAGES == 'true'
       uses: jlumbroso/free-disk-space@main
