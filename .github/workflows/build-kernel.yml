@@ -193,6 +193,7 @@ jobs:
       run: |
         find . -name "msm8953-perf_defconfig" -exec sed -i 's/CONFIG_CC_STACKPROTECTOR_STRONG=y/CONFIG_CC_STACKPROTECTOR_STRONG=n/g' {} +
         find . -name "msm8953-perf_defconfig" -exec sh -c 'echo "CONFIG_CC_STACKPROTECTOR_NONE=y" >> {}' \;
+        find . -name "Makefile" -exec sed -i 's/-Werror//g' {} +
 
     - name: Download source boot image
       if: env.BUILD_BOOT_IMG == 'true'
